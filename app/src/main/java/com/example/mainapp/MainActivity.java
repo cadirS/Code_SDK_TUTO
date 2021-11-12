@@ -28,9 +28,10 @@ public class MainActivity extends BuddyActivity {
     TextView mText1;
     float angle = 0;
     EditText angle_Yes; //Editable text to insert an angle value for "Yes" move
-    private Switch Enable_switch_yes; //switch to enable motor for "yes" move
+    EditText angle_No; //Editable text to insert an angle value for "Yes" move
+    //private Switch Enable_switch_yes; //switch to enable motor for "yes" move
     private Switch Enable_switch_no; //switch to enable motor for "no" move
-
+    private Switch Enable_switch_yes; //switch to enable motor for "no" move
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,47 +41,14 @@ public class MainActivity extends BuddyActivity {
         findViewById(R.id.button_no).setOnClickListener(v -> onButtonNo());
         findViewById(R.id.button_straightYes).setOnClickListener(v -> onButtonStraightYes());
         findViewById(R.id.button_straightNo).setOnClickListener(v -> onButtonStraightNo());//The button allowing Buddy to do a "yes" move
-        Enable_switch_yes = findViewById(R.id.Enable_yes); //Linking between xml switch and Enable_switch_no variable
+        findViewById(R.id.button_stop_no).setOnClickListener(v -> onButtonStopNo());
+        findViewById(R.id.button_stop_yes).setOnClickListener(v -> onButtonStopYes());
+       Enable_switch_yes = findViewById(R.id.Enable_yes); //Linking between xml switch and Enable_switch_no variable
         Enable_switch_no = findViewById(R.id.Enable_no); //Linking between xml switch and Enable_switch_no variable
 
         angle_Yes = findViewById(R.id.angle_yes);//Linking between xml edit_text for "yes" move angle and angle_Yes variable
+        angle_No = findViewById(R.id.angle_no);//Linking between xml edit_text for "no" move angle and angle_No variable
         mText1 = (TextView) findViewById(R.id.textView1);
-        //Switch to enable or disable the motor
-        Enable_switch_yes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked) {
-                    // The motor for "no" move is enable
-                    BuddySDK.USB.enableNoMove(1, new IUsbCommadRsp.Stub() {
-                        @Override
-                        //if the motor succeeded to be enabled,we display motor is enabled
-                        public void onSuccess(String success) throws RemoteException {
-                            Log.i("Motor Yes", "Yes motor Enabled");
-                        }
-
-                        @Override
-                        //if the motor did not succeed to be enabled,we display motor failed to be enabled
-                        public void onFailed(String error) throws RemoteException {
-                            Log.i("Motor Yes", "Yes motor Enabled Failed");
-                        }
-                    });
-                } else    // The motor for "no" move is enable
-                {
-                    BuddySDK.USB.enableNoMove(0, new IUsbCommadRsp.Stub() {
-                        @Override
-                        //if the motor succeeded to be disabled,we display motor is disabled
-                        public void onSuccess(String success) throws RemoteException {
-                            Log.i("Motor Yes", "Yes motor Disabled");
-                        }
-
-                        @Override
-                        //if the motor did not succeed to be disabled,we display motor failed to be disabled
-                        public void onFailed(String error) throws RemoteException {
-                            Log.i("Motor Yes", "Yes motor Disable Failed");
-                        }
-                    });
-                } // end if checked
-            } // end Onchecked callback
-        });
 
 
         // The motor for "yes" move is enable
@@ -121,6 +89,43 @@ public class MainActivity extends BuddyActivity {
         });
 
 
+
+        Enable_switch_yes.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    // The motor for "no" move is enable
+                    BuddySDK.USB.enableNoMove(1, new IUsbCommadRsp.Stub() {
+                        @Override
+                        //if the motor succeeded to be enabled,we display motor is enabled
+                        public void onSuccess(String success) throws RemoteException {
+                            Log.i("Motor No", "No motor Enabled");
+                        }
+
+                        @Override
+                        //if the motor did not succeed to be enabled,we display motor failed to be enabled
+                        public void onFailed(String error) throws RemoteException {
+                            Log.i("Motor No", "No motor Enabled Failed");
+                        }
+                    });
+                } else    // The motor for "no" move is enable
+                {
+                    BuddySDK.USB.enableNoMove(0, new IUsbCommadRsp.Stub() {
+                        @Override
+                        //if the motor succeeded to be disabled,we display motor is disabled
+                        public void onSuccess(String success) throws RemoteException {
+                            Log.i("Motor No", "No motor Disabled");
+                        }
+
+                        @Override
+                        //if the motor did not succeed to be disabled,we display motor failed to be disabled
+                        public void onFailed(String error) throws RemoteException {
+                            Log.i("Motor No", "No motor Disable Failed");
+                        }
+                    });
+                } // end if checked
+            } // end Onchecked callback
+        });
+
     }
 
 
@@ -128,14 +133,17 @@ public class MainActivity extends BuddyActivity {
 
     //button for yes move
     private void onButtonYes() {
-        BuddySDK.USB.buddySayYes(10, 20, new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
+
+        BuddySDK.USB.buddySayYes(10, Integer.parseInt(String.valueOf(angle_Yes.getText())), new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
             @Override
             public void onSuccess(String success) {
                 if (success.equals("YES_MOVE_FINISHED")) { //if function executed well YES_MOVE_FINISHED is sent
 
                 }
             }
-            @Override public void onFailed(String error) {}
+            @Override public void onFailed(String error) {
+
+            }
         });
 
     }
@@ -143,7 +151,8 @@ public class MainActivity extends BuddyActivity {
 
     //button for no move
     private void onButtonNo() {
-        BuddySDK.USB.buddySayNo(10, 20, new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
+
+        BuddySDK.USB.buddySayNo(10, Integer.parseInt(String.valueOf(angle_No.getText())), new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
             @Override
             public void onSuccess(String success) {
                 if (success.equals("NO_MOVE_FINISHED")) {  //if function executed well NO_MOVE_FINISHED is sent
@@ -158,6 +167,7 @@ public class MainActivity extends BuddyActivity {
 
     //button for Straight yes move
     private void onButtonStraightYes() {
+
      BuddySDK.USB.buddySayYesStraight(10, new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
          @Override
          public void onSuccess(String s) throws RemoteException {
@@ -176,6 +186,7 @@ public class MainActivity extends BuddyActivity {
     }
     //button for no straight move move
     private void onButtonStraightNo() {
+
         BuddySDK.USB.buddySayNoStraight(10, new IUsbCommadRsp.Stub() { //function with speed, angle and stub callback
             @Override
             public void onSuccess(String s) throws RemoteException {
@@ -193,13 +204,47 @@ public class MainActivity extends BuddyActivity {
 
 
     }
+    //button for stopping buddySayYesStraight
+    private void onButtonStopYes() {
+        BuddySDK.USB.buddyStopYesMove(new IUsbCommadRsp.Stub() {
+            @Override
+            public void onSuccess(String s) throws RemoteException {
+
+            }
+
+            @Override
+            public void onFailed(String s) throws RemoteException {
+
+            }
+        });
+
+
+    }
+    //button for stopping buddySayNoStraight
+    private void onButtonStopNo() {
+        BuddySDK.USB.buddyStopNoMove(new IUsbCommadRsp.Stub() {
+            @Override
+            public void onSuccess(String s) throws RemoteException {
+
+            }
+
+
+
+            @Override
+            public void onFailed(String s) throws RemoteException {
+
+            }
+        });
+
+    }
 
     @Override
+    //This function is called when the SDK is ready
     public void onSDKReady() {
         BuddySDK.UI.setViewAsFace(findViewById(R.id.view_face));
         BuddySDK.UI.playFacialEvent(FacialEvent.YAWN);
 
-        BuddySDK.USB.enableYesMove(1, new IUsbCommadRsp.Stub() {
+       /* BuddySDK.USB.enableYesMove(1, new IUsbCommadRsp.Stub() {
             @Override
             public void onSuccess(String success) throws RemoteException {
 
@@ -209,7 +254,7 @@ public class MainActivity extends BuddyActivity {
             public void onFailed(String error) throws RemoteException {
 
             }
-        });
+        });*/
     }
 
     // Catches SPEAKING event.
@@ -223,4 +268,6 @@ public class MainActivity extends BuddyActivity {
                 mText1.setText("");
         }
     }
+
+
 }
